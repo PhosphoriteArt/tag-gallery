@@ -1,0 +1,32 @@
+{
+	"name": "tikaka-gallery",
+	"version": "0.1.0",
+	"description": "Example block scaffolded with Create Block tool.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@types/react": "^18.2.39",
+		"@types/wordpress__blocks": "^12.5.11",
+		"@types/wordpress__i18n": "^3.11.0",
+		"@wordpress/scripts": "^26.17.0"
+	},
+	"dependencies": {
+		"@types/wordpress__block-editor": "^11.5.7",
+		"@wordpress/block-editor": "^12.14.0",
+		"@wordpress/blocks": "^12.23.0",
+		"@wordpress/i18n": "^4.46.0",
+		"@wordpress/server-side-render": "^4.23.0",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0"
+	}
+}
