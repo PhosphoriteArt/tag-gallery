@@ -2,7 +2,7 @@
 Contributors:      Phosphorite
 Tags:              block
 Tested up to:      6.1
-Stable tag:        1.1
+Stable tag:        1.1.1
 License:           CC BY-SA 4.0
 License URI:       https://creativecommons.org/licenses/by-sa/4.0/
 
@@ -25,6 +25,9 @@ This plugin was commissioned by [Tikaka](https://tikaka.art)!
 
 
 == Changelog ==
+
+= 1.1.1 =
+* Minor bugfix in hover gif
 
 = 1.1 =
 * gifs will now be frozen until hovered over

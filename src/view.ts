@@ -216,6 +216,7 @@ class HoverGif {
 		if (!urlParsed.pathname.endsWith(".gif")) {
 			return;
 		}
+		_rootEl.setAttribute("data-initialized", "");
 		_rootEl.src = url;
 		_rootEl.addEventListener("load", () => {
 			this._setup();
@@ -233,6 +234,7 @@ class HoverGif {
 			newImg.src = frozenUrl;
 			newImg.classList.add("frozen");
 			newImg.setAttribute("aria-hidden", "true");
+			newImg.setAttribute("data-initialized", "");
 			this._rootEl.insertAdjacentElement("afterend", newImg);
 		} catch (e) {
 			// there's nothing we can do
@@ -247,5 +249,5 @@ document
 	.forEach((gallery) => new TagGallery(gallery));
 
 document
-	.querySelectorAll<HTMLImageElement>(".hover-gif img:not([data-freezegif])")
+	.querySelectorAll<HTMLImageElement>(".hover-gif img:not([data-initialized])")
 	.forEach((gif) => new HoverGif(gif));
