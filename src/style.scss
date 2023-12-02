@@ -1,3 +1,17 @@
+picture {
+	position: relative;
+}
+
+.frozen {
+	position: absolute;
+	top: -5px;
+	left: -5px;
+	pointer-events: none;
+}
+picture:hover .frozen {
+	opacity: 0;
+}
+
 .clickable {
 	cursor: pointer;
 }
@@ -13,7 +27,7 @@
 			0.1s border-color ease-in-out;
 		background: white;
 	}
-	img:hover {
+	picture:hover img {
 		transform: translate(-10px, -10px);
 	}
 }
@@ -35,7 +49,7 @@
 		background: white;
 		transition: 0.1s border-color ease-in-out;
 	}
-	img:hover {
+	picture:hover img {
 		border-color: #f6cb38;
 	}
 	&.popover-flipper {

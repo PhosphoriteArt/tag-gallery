@@ -84,14 +84,14 @@ $media = $getUrlsByTag($tag);
 				</div>
 				<div class="popover-flipper tikaka">
 					<?php foreach ($media as $image) : ?>
-						<?php echo $makeImageFromMedia($image, "clickable") ?>
+						<?php echo $makeImageFromMedia($image, "clickable hover-gif") ?>
 					<?php endforeach; ?>
 				</div>
 			</div>
 
 			<div class="tag-gallery tikaka tikaka-animated">
 				<?php foreach ($media as $image) : ?>
-					<?php echo $makeImageFromMedia($image, "clickable"); ?>
+					<?php echo $makeImageFromMedia($image, "clickable hover-gif"); ?>
 				<?php endforeach; ?>
 			</div>
 		<?php elseif (!empty($tag)) : ?>

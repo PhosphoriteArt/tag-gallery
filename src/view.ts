@@ -1,3 +1,5 @@
+import parseSrcset from "srcset-parse";
+
 function isPointWithinImage(
 	image: HTMLImageElement,
 	mouseX: number,
@@ -157,8 +159,10 @@ class TagPopover {
 			other.removeAttribute("data-active");
 		});
 
-		const next = el.querySelector("img")!.cloneNode(true) as HTMLImageElement;
-		next.addEventListener('click', this.onImageClick);
+		const next = el
+			.querySelector("img:not(.frozen)")!
+			.cloneNode(true) as HTMLImageElement;
+		next.addEventListener("click", this.onImageClick);
 		this._mainImage.replaceWith(next);
 		this._mainImage = next;
 
@@ -181,6 +185,8 @@ class TagGallery {
 		rootEl
 			.querySelectorAll<HTMLPictureElement>(".tag-gallery picture")
 			.forEach(this._setupPicture);
+
+		rootEl.setAttribute("data-initialized", "");
 	}
 
 	private _setupPicture = (picture: HTMLPictureElement) => {
@@ -195,6 +201,51 @@ class TagGallery {
 	};
 }
 
+class HoverGif {
+	constructor(private _rootEl: HTMLImageElement) {
+		let url = _rootEl.src;
+		if (_rootEl.srcset) {
+			const candidates = parseSrcset(_rootEl.srcset);
+			const bestCandidate = candidates[candidates.length - 1];
+			if (bestCandidate) {
+				url = bestCandidate.url;
+			}
+		}
+
+		const urlParsed = new URL(url);
+		if (!urlParsed.pathname.endsWith(".gif")) {
+			return;
+		}
+		_rootEl.src = url;
+		_rootEl.addEventListener("load", () => {
+			this._setup();
+		});
+	}
+
+	private _setup = () => {
+		const canvas = document.createElement("canvas");
+		const width = (canvas.width = this._rootEl.naturalWidth);
+		const height = (canvas.height = this._rootEl.naturalHeight);
+		canvas.getContext("2d")?.drawImage(this._rootEl, 0, 0, width, height);
+		try {
+			const frozenUrl = canvas.toDataURL("image/gif");
+			const newImg = document.createElement("img");
+			newImg.src = frozenUrl;
+			newImg.classList.add("frozen");
+			newImg.setAttribute("aria-hidden", "true");
+			this._rootEl.insertAdjacentElement("afterend", newImg);
+		} catch (e) {
+			// there's nothing we can do
+		}
+	};
+}
+
 document
-	.querySelectorAll<HTMLDivElement>(".tag-gallery-container:not([data-empty])")
+	.querySelectorAll<HTMLDivElement>(
+		".tag-gallery-container:not([data-empty]):not([data-initialized])",
+	)
 	.forEach((gallery) => new TagGallery(gallery));
+
+document
+	.querySelectorAll<HTMLImageElement>(".hover-gif img:not([data-freezegif])")
+	.forEach((gif) => new HoverGif(gif));
