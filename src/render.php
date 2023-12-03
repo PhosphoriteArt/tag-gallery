@@ -6,47 +6,15 @@ $arrow = '<svg width="100%" height="100%" viewBox="0 0 15 15" version="1.1" xmln
 
 $tag = $attributes["query"];
 
-$getUrlsByTag = function (string $tag): array {
-	if (!$tag || empty($tag)) {
-		return array();
-	}
-
-	$posts = get_posts(array(
-		'numberposts' => -1,
-		'tag' => $tag,
-	));
-
-	$media_posts = array();
-	if (!$posts) {
-		return $media_posts;
-	}
-
-	foreach ($posts as $post) {
-		$dom = new DOMDocument();
-		$html = apply_filters('the_content', $post->post_content);
-		@$dom->loadHTML($html);
-		foreach ($dom->getElementsByTagName('img') as $img) {
-			array_push($media_posts, array(
-				'src' => $img->getAttribute('src'),
-				'alt' => $img->getAttribute('alt'),
-				'srcset' => $img->getAttribute('srcset'),
-				'sizes' => $img->getAttribute('sizes')
-			));
-		}
-	}
-
-	return $media_posts;
-};
-
-$makeImageFromMedia = function (array $image, string $extraClasses = ""): string {
-	$src = $image['src'];
-	$alt = $image['alt'];
+$makeImageFromMedia = function (TagGalleryImageInfo $image, string $extraClasses = ""): string {
+	$src = $image->src;
+	$alt = $image->alt;
 	$extra = '';
-	if (!empty($image['srcset'])) {
-		$extra .= sprintf('srcset="%s"', $image['srcset']);
+	if (!empty($image->srcset)) {
+		$extra .= sprintf('srcset="%s"', $image->srcset);
 	}
-	if (!empty($image['sizes'])) {
-		$extra .= sprintf('sizes="%s"', $image['sizes']);
+	if (!empty($image->sizes)) {
+		$extra .= sprintf('sizes="%s"', $image->sizes);
 	}
 	return sprintf(
 		<<<HTML
@@ -61,7 +29,7 @@ HTML,
 	);
 };
 
-$media = $getUrlsByTag($tag);
+$media = tag_gallery_get_cached_info($tag);
 
 ?>
 
