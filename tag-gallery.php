@@ -33,7 +33,7 @@ function create_block_tikaka_gallery_block_init() {
 }
 
 function tag_gallery_on_save($post_id) {
-	tag_gallery_init();
+	TagGalleryDB::init();
 }
 
 register_activation_hook(__FILE__, 'tag_gallery_init');

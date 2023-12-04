@@ -36,7 +36,7 @@ HTML,
 	);
 };
 
-$media = tag_gallery_get_cached_info($query, $ascending);
+$media = TagGalleryDB::query($query, $ascending);
 $randomId = sprintf("wrapper-%d", rand());
 
 ?>
@@ -89,7 +89,7 @@ $randomId = sprintf("wrapper-%d", rand());
 				<div style="display: flex; flex-direction: column; width: fit-content;">
 					<div>Available tags:</div>
 					<ul>
-						<?php foreach (tag_gallery_get_all_tags() as $tag) : ?>
+						<?php foreach (TagGalleryUtils::get_all_tag_slugs() as $tag) : ?>
 							<li><code><?php echo $tag ?></code></li>
 						<?php endforeach ?>
 					</ul>

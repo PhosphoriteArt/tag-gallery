@@ -1,152 +1,151 @@
 <?php
 require_once(__DIR__ . '/util.php');
 
-function tag_gallery_table_name()
+class TagGalleryDB
 {
-    global $wpdb;
-    return $wpdb->prefix . 'tag_gallery_cache';
-}
-
-function tag_gallery_drop_table()
-{
-    global $wpdb;
-    $name = tag_gallery_table_name();
-    $wpdb->query("DROP TABLE IF EXISTS $name");
-}
-
-function tag_gallery_setup_db()
-{
-    global $wpdb;
-    $name = tag_gallery_table_name();
-    tag_gallery_drop_table();
-    $wpdb->query(<<<SQL
-CREATE TABLE $name (
-    post_id INT,
-    src TEXT,
-    alt TEXT,
-    srcset TEXT,
-    sizes TEXT,
-    tag TEXT,
-    post_date_gmt TEXT
-);
-SQL);
-}
-
-function tag_gallery_init()
-{    
-    global $wpdb;
-    $wpdb->query('START TRANSACTION');
-    tag_gallery_setup_db();
-    $tags = tag_gallery_get_all_tags();
-
-    foreach ($tags as $tag) {
-        tag_gallery_update_tag_cache($tag);
+    static function table_name(): string
+    {
+        global $wpdb;
+        return $wpdb->prefix . 'tag_gallery_cache';
     }
-    $wpdb->query('COMMIT');
-}
 
-function tag_gallery_update_tag_cache(string $tag)
-{
-    global $wpdb;
-    $name = tag_gallery_table_name();
-
-    $wpdb->query($wpdb->prepare("DELETE FROM $name WHERE tag = %s", $tag));
-    $images = tag_gallery_get_image_info_from_posts($tag);
-    foreach ($images as $image) {
-        $wpdb->insert($name, $image->as_array(), $image->types());
+    static function drop_table()
+    {
+        global $wpdb;
+        $wpdb->query("DROP TABLE IF EXISTS " . TagGalleryDB::table_name());
     }
-}
+    private static function setup_db()
+    {
+        global $wpdb;
+        TagGalleryDB::drop_table();
+        $name = TagGalleryDB::table_name();
+        $wpdb->query(<<<SQL
+            CREATE TABLE $name (
+                post_id INT,
+                src TEXT,
+                alt TEXT,
+                srcset TEXT,
+                sizes TEXT,
+                tag TEXT,
+                post_date_gmt TEXT
+            );
+        SQL);
+    }
 
-function tag_gallery_sort_by_gmt(TagGalleryImageInfo $a, TagGalleryImageInfo $b): int
-{
-    return strcmp($b->post_date_gmt, $a->post_date_gmt);
-}
+    static function init()
+    {
+        global $wpdb;
+        $wpdb->query('START TRANSACTION');
+        TagGalleryDB::setup_db();
+        foreach (get_posts(array(
+            'numberposts' => -1
+        )) as $post) {
+            TagGalleryDB::add_post_to_cache($post);
+        }
+        $wpdb->query('COMMIT');
+    }
 
-function tag_gallery_push_if_new(array &$arr, TagGalleryImageInfo $info)
-{
-    foreach ($arr as $el) {
-        if ($info->equivalentTo($el)) {
-            return;
+    private static function add_post_to_cache(WP_Post $post)
+    {
+        global $wpdb;
+        $infos = TagGalleryImageInfo::from_post($post);
+        foreach ($infos as $image) {
+            $wpdb->insert(TagGalleryDB::table_name(), $image->as_array(), $image->types());
         }
     }
-    array_push($arr, $info);
-}
-function tag_gallery_remove_equivalent(array &$arr, TagGalleryImageInfo $info)
-{
-    for ($i = count($arr) - 1; $i >= 0; $i--) {
-        $el = $arr[$i];
-        if ($info->equivalentTo($el)) {
-            array_splice($arr, $i, 1);
-        }
-    }
-}
 
-function tag_gallery_get_all_cached(): array
-{
-    $name = tag_gallery_table_name();
-    global $wpdb;
+    static function query(string $query, bool $ascending): array
+    {
+        global $wpdb;
+        $name = TagGalleryDB::table_name();
+        $instructions = explode(' ', $query);
 
-    $rows = $wpdb->get_results(<<<SQL
-        SELECT * FROM $name
-    SQL, ARRAY_A);
+        $query = '';
 
-    $results = array();
-    foreach ($rows as $row) {
-        tag_gallery_push_if_new($results, TagGalleryImageInfo::from_db($row));
-    }
-    return $results;
-}
-
-function tag_gallery_get_tag_cached(string $tag): array
-{
-    if (empty($tag)) {
-        return array();
-    }
-
-    $name = tag_gallery_table_name();
-    global $wpdb;
-
-    $results = array();
-    $rows = $wpdb->get_results($wpdb->prepare(<<<SQL
-        SELECT * FROM $name
-        WHERE tag = %s
-    SQL, $tag), ARRAY_A);
-
-    foreach ($rows as $row) {
-        tag_gallery_push_if_new($results, TagGalleryImageInfo::from_db($row));
-    }
-
-    return $results;
-}
-
-function tag_gallery_get_cached_info(string $query, bool $ascending): array
-{
-    $instructions = explode(' ', $query);
-    $entries = array();
-
-    foreach ($instructions as $instruction) {
-        $negative = substr($instruction, 0, 1) == '!';
-        if ($negative) {
-            $instruction = substr($instruction, 1);
-        }
-        $all = $instruction == '*';
-
-        $results = $all ? tag_gallery_get_all_cached() : tag_gallery_get_tag_cached($instruction);
-        if ($negative) {
-            foreach ($results as $result) {
-                tag_gallery_remove_equivalent($entries, $result);
+        foreach ($instructions as $instruction) {
+            $negative = substr($instruction, 0, 1) == '!';
+            if ($negative) {
+                $instruction = substr($instruction, 1);
+                if (empty($query)) {
+                    // Negative is meaningless with nothing yet captured
+                    continue;
+                }
             }
+            $all = $instruction == '*';
+
+            if ($negative && $all) {
+                // Clear query, equivalent to removing everything.
+                $query = '';
+                continue;
+            }
+
+            if ($negative) {
+                $query .= "\n\nEXCEPT\n" . $wpdb->prepare(<<<SQL
+                    SELECT DISTINCT
+                        src,
+                        alt,
+                        srcset,
+                        sizes,
+                        MAX(post_date_gmt) as post_date_gmt
+                    FROM
+                        $name t
+                    WHERE
+                        t.tag = %s
+                    GROUP BY src, alt, srcset, sizes, t.tag
+                SQL, $instruction);
+            } else if ($all) {
+                if (!empty($query)) {
+                    $query .= "\n\nUNION";
+                }
+
+                $query .= "\n\n" . $wpdb->prepare(<<<SQL
+                    SELECT DISTINCT
+                        src,
+                        alt,
+                        srcset,
+                        sizes,
+                        MAX(post_date_gmt) as post_date_gmt
+                    FROM
+                        $name
+                    GROUP BY src, alt, srcset, sizes, tag
+                SQL);
+            } else {
+                if (!empty($query)) {
+                    $query .= "\n\nUNION";
+                }
+
+                $query .= "\n\n" . $wpdb->prepare(<<<SQL
+                    SELECT DISTINCT
+                        src,
+                        alt,
+                        srcset,
+                        sizes,
+                        MAX(post_date_gmt) as post_date_gmt
+                    FROM
+                        $name t
+                    WHERE
+                        t.tag = %s
+                    GROUP BY src, alt, srcset, sizes, t.tag
+                SQL, $instruction);
+            }
+        }
+
+        if (empty($query)) {
+            return array();
+        }
+        if ($ascending) {
+            $query .= "\nORDER BY post_date_gmt ASC";
         } else {
-            foreach ($results as $result) {
-                tag_gallery_push_if_new($entries, $result);
-            }
+            $query .= "\nORDER BY post_date_gmt DESC";
         }
-    }
 
-    usort($entries, 'tag_gallery_sort_by_gmt');
-    if ($ascending) {
-        $entries = array_reverse($entries);
-    }
+        $rows = $wpdb->get_results($query, ARRAY_A);
+        $entries = array();
 
-    return $entries;
+        foreach ($rows as $row) {
+            array_push($entries, TagGalleryImageInfo::from_db($row));
+        }
+
+        return $entries;
+    }
 }

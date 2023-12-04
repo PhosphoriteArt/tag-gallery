@@ -46,64 +46,59 @@ class TagGalleryImageInfo
         $info->alt = $row["alt"];
         $info->srcset = $row["srcset"];
         $info->sizes = $row["sizes"];
-        $info->post_id = intval($row["post_id"]);
-        $info->tag = $row["tag"];
+        $info->post_id = array_key_exists("post_id", $row) ? intval($row["post_id"]) : -1;
+        $info->tag = array_key_exists("tag", $row) ? $row["tag"] : "UNSET";
         $info->post_date_gmt = $row["post_date_gmt"];
 
         return $info;
     }
 
-    function equivalentTo(TagGalleryImageInfo $other): bool
+    function equivalent_to(TagGalleryImageInfo $other): bool
     {
         return $other->src == $this->src && $other->srcset == $this->srcset && $other->alt == $this->alt && $other->sizes == $this->sizes;
     }
-}
 
-function tag_gallery_get_image_info_from_posts(string $tag): array
-{
-    if (!$tag || empty($tag)) {
-        return array();
+    static function from_img_tag(mixed $img, WP_Post $post, string $tag): TagGalleryImageInfo
+    {
+        $imgInfo = new TagGalleryImageInfo();
+        $imgInfo->src = $img->getAttribute('src');
+        $imgInfo->alt = $img->getAttribute('alt');
+        $imgInfo->srcset = $img->getAttribute('srcset');
+        $imgInfo->sizes = $img->getAttribute('sizes');
+        $imgInfo->tag = $tag;
+        $imgInfo->post_id = $post->ID;
+        $imgInfo->post_date_gmt = $post->post_date_gmt;
+        return $imgInfo;
     }
 
-    $posts = get_posts(array(
-        'numberposts' => -1,
-        'tag' => $tag,
-    ));
-
-    $media_posts = array();
-    if (!$posts) {
-        return $media_posts;
-    }
-
-    foreach ($posts as $post) {
+    static function from_post(WP_Post $post): array
+    {
+        $tags = wp_get_post_tags($post->ID);
+        $infos = array();
         $dom = new DOMDocument();
         $html = apply_filters('the_content', $post->post_content);
         @$dom->loadHTML($html);
         foreach ($dom->getElementsByTagName('img') as $img) {
-            $imgInfo = new TagGalleryImageInfo();
-            $imgInfo->src = $img->getAttribute('src');
-            $imgInfo->alt = $img->getAttribute('alt');
-            $imgInfo->srcset = $img->getAttribute('srcset');
-            $imgInfo->sizes = $img->getAttribute('sizes');
-            $imgInfo->tag = $tag;
-            $imgInfo->post_id = $post->ID;
-            $imgInfo->post_date_gmt = $post->post_date_gmt;
-            array_push($media_posts, $imgInfo);
+            foreach ($tags as $tag) {
+                array_push($infos, TagGalleryImageInfo::from_img_tag($img, $post, $tag->slug));
+            }
         }
+        return $infos;
     }
-
-    return $media_posts;
 }
 
-function tag_gallery_get_all_tags(): array
+class TagGalleryUtils
 {
-    $tags = get_tags(array(
-        'hide_empty' => false
-    ));
-    $tagSlugs = array();
-    foreach ($tags as $tag) {
-        array_push($tagSlugs, $tag->slug);
-    };
+    static function get_all_tag_slugs(): array
+    {
+        $tags = get_tags(array(
+            'hide_empty' => false
+        ));
+        $tagSlugs = array();
+        foreach ($tags as $tag) {
+            array_push($tagSlugs, $tag->slug);
+        };
 
-    return $tagSlugs;
+        return $tagSlugs;
+    }
 }
