@@ -1,10 +1,11 @@
 {
 	"name": "tag-gallery",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"description": "Example block scaffolded with Create Block tool.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
+	"files": ["*.php", "LICENSE.md", "readme.txt", "build/*"],
 	"scripts": {
 		"build": "wp-scripts build",
 		"format": "wp-scripts format",

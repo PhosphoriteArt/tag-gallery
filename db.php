@@ -27,15 +27,13 @@ CREATE TABLE $name (
     srcset TEXT,
     sizes TEXT,
     tag TEXT,
-    post_date_gmt TEXT,
-    _id INT NOT NULL AUTO_INCREMENT,
-    PRIMARY KEY (_id)
+    post_date_gmt TEXT
 );
 SQL);
 }
 
 function tag_gallery_init()
-{
+{    
     global $wpdb;
     $wpdb->query('START TRANSACTION');
     tag_gallery_setup_db();

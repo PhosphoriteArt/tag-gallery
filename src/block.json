@@ -1,8 +1,8 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "tag-gallery/tag-gallery",
-	"version": "1.2",
+	"name": "create-block/tikaka-gallery",
+	"version": "1.2.1",
 	"title": "Tag Gallery",
 	"category": "widgets",
 	"icon": "nametag",
