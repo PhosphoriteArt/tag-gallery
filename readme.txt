@@ -2,7 +2,7 @@
 Contributors:      Phosphorite
 Tags:              block
 Tested up to:      6.1
-Stable tag:        1.1.1
+Stable tag:        1.2
 License:           CC BY-SA 4.0
 License URI:       https://creativecommons.org/licenses/by-sa/4.0/
 
@@ -25,6 +25,12 @@ This plugin was commissioned by [Tikaka](https://tikaka.art)!
 
 
 == Changelog ==
+
+= 1.2 =
+* Cache images and parse information in the database
+* Update database information on post save and on activate
+* Lots of new settings
+* Advanced Search (combine multiple tags, exclude tags)
 
 = 1.1.1 =
 * Minor bugfix in hover gif

@@ -2,14 +2,20 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "tag-gallery/tag-gallery",
-	"version": "0.1.0",
+	"version": "1.2",
 	"title": "Tag Gallery",
 	"category": "widgets",
 	"icon": "nametag",
 	"description": "Enter in a tag and I'll pull all the images with that tag into a nice gallery",
 	"example": {
 		"attributes": {
-			"query": "torkku"
+			"query": "torkku",
+			"ascending": false,
+			"gallery_color": "#f6cb38",
+			"gallery_size": 150,
+			"gallery_spacing": 10,
+			"gallery_border": 5,
+			"gallery_popout": 10
 		}
 	},
 	"supports": {
