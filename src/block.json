@@ -25,6 +25,30 @@
 		"query": {
 			"type": "string",
 			"default": ""
+		},
+		"ascending": {
+			"type": "boolean",
+			"default": false
+		},
+		"gallery_color": {
+			"type": "string",
+			"default": "#f6cb38"
+		},
+		"gallery_size": {
+			"type": "number",
+			"default": 150
+		},
+		"gallery_spacing": {
+			"type": "number",
+			"default": 10
+		},
+		"gallery_border": {
+			"type": "number",
+			"default": 5
+		},
+		"gallery_popout": {
+			"type": "number",
+			"default": 10
 		}
 	}
 }

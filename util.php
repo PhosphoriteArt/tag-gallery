@@ -9,6 +9,7 @@ class TagGalleryImageInfo
     public string $srcset;
     public string $sizes;
     public int $post_id;
+    public string $post_date_gmt;
 
     public string $tag;
 
@@ -20,6 +21,7 @@ class TagGalleryImageInfo
             'srcset' => $this->srcset,
             'sizes' => $this->sizes,
             'post_id' => $this->post_id,
+            'post_date_gmt' => $this->post_date_gmt,
             'tag' => $this->tag
         );
     }
@@ -27,6 +29,7 @@ class TagGalleryImageInfo
     function types(): array
     {
         return array(
+            '%s',
             '%s',
             '%s',
             '%s',
@@ -46,6 +49,7 @@ class TagGalleryImageInfo
         $info->sizes = $row["sizes"];
         $info->post_id = intval($row["post_id"]);
         $info->tag = $row["tag"];
+        $info->post_date_gmt = $row["post_date_gmt"];
 
         return $info;
     }
@@ -80,6 +84,7 @@ function tag_gallery_get_image_info_from_posts(string $tag): array
             $imgInfo->sizes = $img->getAttribute('sizes');
             $imgInfo->tag = $tag;
             $imgInfo->post_id = $post->ID;
+            $imgInfo->post_date_gmt = $post->post_date_gmt;
             array_push($media_posts, $imgInfo);
         }
     }

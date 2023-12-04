@@ -5,6 +5,13 @@ declare(strict_types=1);
 $arrow = '<svg width="100%" height="100%" viewBox="0 0 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path d="M2.363,7.5l10.274,-7.5l-0,15l-10.274,-7.5Z"/></svg>';
 
 $tag = $attributes["query"];
+$ascending = $attributes["ascending"];
+$gallery_size = $attributes["gallery_size"];
+$gallery_spacing = $attributes["gallery_spacing"];
+$gallery_color = $attributes["gallery_color"];
+$gallery_border = $attributes["gallery_border"];
+$gallery_popout = $attributes["gallery_popout"];
+
 
 $makeImageFromMedia = function (TagGalleryImageInfo $image, string $extraClasses = ""): string {
 	$src = $image->src;
@@ -29,12 +36,22 @@ HTML,
 	);
 };
 
-$media = tag_gallery_get_cached_info($tag);
+$media = tag_gallery_get_cached_info($tag, $ascending);
+$randomId = sprintf("wrapper-%d", rand());
 
 ?>
 
+<style>
+	#<?php echo $randomId ?> >  .tag-gallery-container {
+		--gallery-spacing: <?php echo $gallery_spacing ?>px;
+		--gallery-size: <?php echo $gallery_size ?>px;
+		--highlight-color: <?php echo $gallery_color ?>;
+		--border-size: <?php echo $gallery_border ?>px;
+		--popout-amount: <?php echo $gallery_popout ?>px;
+	}
+</style>
 
-<div <?php echo get_block_wrapper_attributes(); ?>>
+<div <?php echo get_block_wrapper_attributes(); ?> id="<?php echo $randomId ?>">
 	<div class="tag-gallery-container" <?php echo count($media) > 0 ? '' : 'data-empty' ?>>
 		<?php if (count($media) > 0) : ?>
 			<div class="tag-popover" aria-hidden="true">

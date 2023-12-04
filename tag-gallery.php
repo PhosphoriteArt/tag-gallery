@@ -33,7 +33,7 @@ function tag_gallery_tag_gallery_block_init() {
 }
 
 function tag_gallery_on_save($post_id) {
-	updatePost(get_post($post_id));
+	tag_gallery_init();
 }
 
 register_activation_hook(__FILE__, 'tag_gallery_init');

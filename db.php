@@ -25,6 +25,7 @@ CREATE TABLE $name (
     srcset TEXT,
     sizes TEXT,
     tag TEXT,
+    post_date_gmt TEXT,
     _id INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (_id)
 );
@@ -33,12 +34,15 @@ SQL);
 
 function tag_gallery_init()
 {
+    global $wpdb;
+    $wpdb->query('START TRANSACTION');
     tag_gallery_setup_db();
     $tags = tag_gallery_get_all_tags();
 
     foreach ($tags as $tag) {
         tag_gallery_update_tag_cache($tag);
     }
+    $wpdb->query('COMMIT');
 }
 
 function tag_gallery_update_tag_cache(string $tag)
@@ -53,15 +57,7 @@ function tag_gallery_update_tag_cache(string $tag)
     }
 }
 
-function updatePost(WP_Post $post)
-{
-    $tags = wp_get_post_tags($post->ID);
-    foreach ($tags as $tag) {
-        tag_gallery_update_tag_cache($tag->slug);
-    }
-}
-
-function tag_gallery_get_cached_info(string $tag): array
+function tag_gallery_get_cached_info(string $tag, bool $ascending): array
 {
     if (empty($tag)) {
         return array();
@@ -70,10 +66,12 @@ function tag_gallery_get_cached_info(string $tag): array
     $name = tag_gallery_table_name();
     global $wpdb;
 
+    $direction = $ascending ? 'ASC' : 'DESC';
     $results = array();
     $rows = $wpdb->get_results($wpdb->prepare(<<<SQL
         SELECT * FROM $name
         WHERE tag = %s
+        ORDER BY post_date_gmt $direction
 SQL, $tag), ARRAY_A);
 
     foreach ($rows as $row) {

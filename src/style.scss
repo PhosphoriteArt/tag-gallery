@@ -4,8 +4,8 @@ picture {
 
 .frozen {
 	position: absolute;
-	top: -5px;
-	left: -5px;
+	top: calc(-1 * var(--border-size));
+	left: calc(-1 * var(--border-size));
 	pointer-events: none;
 }
 picture:hover .frozen {
@@ -28,14 +28,14 @@ picture:hover .frozen {
 		background: white;
 	}
 	picture:hover img {
-		transform: translate(-10px, -10px);
+		transform: translate(calc(-1 * var(--popout-amount)), calc(-1 * var(--popout-amount)));
 	}
 }
 
 .tikaka {
 	img,
 	picture {
-		border: 5px solid black;
+		border: var(--border-size) solid black;
 	}
 
 	picture {
@@ -50,16 +50,22 @@ picture:hover .frozen {
 		transition: 0.1s border-color ease-in-out;
 	}
 	picture:hover img {
-		border-color: #f6cb38;
+		border-color: var(--highlight-color);
 	}
 	&.popover-flipper {
 		picture:hover {
-			border-color: #f6cb38;
+			border-color: var(--highlight-color);
 		}
 	}
 }
 
 .tag-gallery-container {
+	--gallery-spacing: 10px;
+	--gallery-size: 150px;
+	--highlight-color: #f6cb38;
+	--border-size: 5px;
+	--popout-amount: 10px;
+
 	text-align: center;
 
 	img {
@@ -77,18 +83,18 @@ picture:hover .frozen {
 		justify-content: center;
 
 		img {
-			width: 150px;
-			min-width: 150px;
-			max-width: 150px;
-			height: 150px;
-			min-height: 150px;
-			max-height: 150px;
+			width: var(--gallery-size);
+			min-width: var(--gallery-size);
+			max-width: var(--gallery-size);
+			height: var(--gallery-size);
+			min-height: var(--gallery-size);
+			max-height: var(--gallery-size);
 		}
 
 		picture {
-			width: 150px;
-			height: 150px;
-			margin: 10px;
+			width: var(--gallery-size);
+			height: var(--gallery-size);
+			margin: var(--gallery-spacing);
 		}
 	}
 }
