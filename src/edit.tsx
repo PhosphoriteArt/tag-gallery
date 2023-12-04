@@ -162,6 +162,24 @@ export const Edit: React.FC<
 								}
 							/>
 						</details>
+						<details>
+							<summary>Advanced Search</summary>
+							<div>
+								<header style={{fontWeight: 'bold'}}>Did you know you that you can search for multiple tags, or exclude tags?</header>
+								<p>
+								Specify multiple tags with spaces to combine them: <code>vilu puddle</code>
+								</p>
+								<p>
+									Specify a tag prepended with <code>!</code> to exclude posts tagged with that: <code>vilu !puddle</code> (posts with vilu but without puddle)
+								</p>
+								<p>
+									Use the special tag <code>*</code> to include all: <code>* !torkku</code> (every post except those with torkku)
+								</p>
+								<p>
+									Instructions are carried out left-to-right
+								</p>
+							</div>
+						</details>
 					</div>
 				</div>
 			</InspectorControls>

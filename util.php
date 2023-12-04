@@ -40,9 +40,8 @@ class TagGalleryImageInfo
     }
 
     static function from_db(array $row): TagGalleryImageInfo
- {
-        $info = new TagGalleryImageInfo
-    ();
+    {
+        $info = new TagGalleryImageInfo();
         $info->src = $row["src"];
         $info->alt = $row["alt"];
         $info->srcset = $row["srcset"];
@@ -52,6 +51,11 @@ class TagGalleryImageInfo
         $info->post_date_gmt = $row["post_date_gmt"];
 
         return $info;
+    }
+
+    function equivalentTo(TagGalleryImageInfo $other): bool
+    {
+        return $other->src == $this->src && $other->srcset == $this->srcset && $other->alt == $this->alt && $other->sizes == $this->sizes;
     }
 }
 
@@ -76,8 +80,7 @@ function tag_gallery_get_image_info_from_posts(string $tag): array
         $html = apply_filters('the_content', $post->post_content);
         @$dom->loadHTML($html);
         foreach ($dom->getElementsByTagName('img') as $img) {
-            $imgInfo = new TagGalleryImageInfo
-        ();
+            $imgInfo = new TagGalleryImageInfo();
             $imgInfo->src = $img->getAttribute('src');
             $imgInfo->alt = $img->getAttribute('alt');
             $imgInfo->srcset = $img->getAttribute('srcset');
@@ -104,4 +107,3 @@ function tag_gallery_get_all_tags(): array
 
     return $tagSlugs;
 }
-

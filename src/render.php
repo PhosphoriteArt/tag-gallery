@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $arrow = '<svg width="100%" height="100%" viewBox="0 0 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path d="M2.363,7.5l10.274,-7.5l-0,15l-10.274,-7.5Z"/></svg>';
 
-$tag = $attributes["query"];
+$query = $attributes["query"];
 $ascending = $attributes["ascending"];
 $gallery_size = $attributes["gallery_size"];
 $gallery_spacing = $attributes["gallery_spacing"];
@@ -36,13 +36,13 @@ HTML,
 	);
 };
 
-$media = tag_gallery_get_cached_info($tag, $ascending);
+$media = tag_gallery_get_cached_info($query, $ascending);
 $randomId = sprintf("wrapper-%d", rand());
 
 ?>
 
 <style>
-	#<?php echo $randomId ?> >  .tag-gallery-container {
+	#<?php echo $randomId ?>>.tag-gallery-container {
 		--gallery-spacing: <?php echo $gallery_spacing ?>px;
 		--gallery-size: <?php echo $gallery_size ?>px;
 		--highlight-color: <?php echo $gallery_color ?>;
@@ -79,10 +79,22 @@ $randomId = sprintf("wrapper-%d", rand());
 					<?php echo $makeImageFromMedia($image, "clickable hover-gif"); ?>
 				<?php endforeach; ?>
 			</div>
-		<?php elseif (!empty($tag)) : ?>
-			<div>No images found with tag <code><?php echo $tag ?></code></div>
 		<?php else : ?>
-			<div>No tag selected, can't locate images. Enter a tag in the block settings to the right!</div>
+			<?php if (!empty($query)) : ?>
+				<div>No images found using query <code><?php echo $query ?></code>.</div>
+			<?php else : ?>
+				<div>No tag selected, can't locate images. Enter a tag in the block settings to the right!</div>
+			<?php endif; ?>
+			<div style="display: flex; flex-direction: column; align-items: center;">
+				<div style="display: flex; flex-direction: column; width: fit-content;">
+					<div>Available tags:</div>
+					<ul>
+						<?php foreach (tag_gallery_get_all_tags() as $tag) : ?>
+							<li><code><?php echo $tag ?></code></li>
+						<?php endforeach ?>
+					</ul>
+				</div>
+			</div>
 		<?php endif; ?>
 	</div>
 </div>
