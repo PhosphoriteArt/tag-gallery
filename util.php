@@ -58,7 +58,7 @@ class TagGalleryImageInfo
         return $other->src == $this->src && $other->srcset == $this->srcset && $other->alt == $this->alt && $other->sizes == $this->sizes;
     }
 
-    static function from_img_tag(mixed $img, WP_Post $post, string $tag): TagGalleryImageInfo
+    static function from_img_tag(DOMElement $img, WP_Post $post, string $tag): TagGalleryImageInfo
     {
         $imgInfo = new TagGalleryImageInfo();
         $imgInfo->src = $img->getAttribute('src');

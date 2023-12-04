@@ -36,7 +36,7 @@ function tag_gallery_on_save($post_id) {
 	TagGalleryDB::init();
 }
 
-register_activation_hook(__FILE__, 'tag_gallery_init');
+register_activation_hook(__FILE__, array('TagGalleryDB', 'init'));
 
 add_action( 'init', 'create_block_tikaka_gallery_block_init' );
 
