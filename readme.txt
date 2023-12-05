@@ -2,7 +2,7 @@
 Contributors:      Phosphorite
 Tags:              block
 Tested up to:      6.1
-Stable tag:        1.2.2
+Stable tag:        1.2.3
 License:           CC BY-SA 4.0
 License URI:       https://creativecommons.org/licenses/by-sa/4.0/
 
@@ -25,6 +25,10 @@ This plugin was commissioned by [Tikaka](https://tikaka.art)!
 
 
 == Changelog ==
+= 1.2.3 =
+* No longer shows images from private or trashed posts
+* does not trigger a full rebuild on every publish
+
 = 1.2.2 =
 * Faster rendering and better code
 

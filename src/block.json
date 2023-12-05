@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "create-block/tikaka-gallery",
-	"version": "1.2.2",
+	"version": "1.2.3",
 	"title": "Tag Gallery",
 	"category": "widgets",
 	"icon": "nametag",
