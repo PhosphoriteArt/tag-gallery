@@ -54,6 +54,21 @@ class TagGalleryDB
         }
     }
 
+    static function delete_cached_post(int $postId) {
+        global $wpdb;
+        $name = TagGalleryDB::table_name();
+        $wpdb->query($wpdb->prepare("DELETE FROM $name WHERE post_id = %d", $postId));
+    }
+
+    static function update_cached_post(int $postId) {
+        global $wpdb;
+        $post = get_post($postId);
+        $wpdb->query("START TRANSACTION");
+        TagGalleryDB::delete_cached_post($postId);
+        TagGalleryDB::add_post_to_cache($post);
+        $wpdb->query("COMMIT");
+    }
+
     static function query(string $query, bool $ascending): array
     {
         global $wpdb;

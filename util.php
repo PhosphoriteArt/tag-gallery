@@ -73,17 +73,30 @@ class TagGalleryImageInfo
 
     static function from_post(WP_Post $post): array
     {
+        if (get_post_status($post) != 'publish') {
+            // Don't include trashed or private posts
+            return array();
+        }
+
         $tags = wp_get_post_tags($post->ID);
         $infos = array();
         $dom = new DOMDocument();
         $html = apply_filters('the_content', $post->post_content);
-        @$dom->loadHTML($html);
-        foreach ($dom->getElementsByTagName('img') as $img) {
-            foreach ($tags as $tag) {
-                array_push($infos, TagGalleryImageInfo::from_img_tag($img, $post, $tag->slug));
-            }
+        if (empty($html)) {
+            return array();
         }
-        return $infos;
+        try {
+            @$dom->loadHTML($html);
+            foreach ($dom->getElementsByTagName('img') as $img) {
+                foreach ($tags as $tag) {
+                    array_push($infos, TagGalleryImageInfo::from_img_tag($img, $post, $tag->slug));
+                }
+            }
+            return $infos;
+        } catch (Exception $e) {
+            error_log($e->getMessage() . "\n" . $e->getTraceAsString());
+            return array();
+        }
     }
 }
 
