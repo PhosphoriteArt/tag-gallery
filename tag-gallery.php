@@ -79,4 +79,4 @@ add_action('untrashed_post', 'tag_gallery_on_save');
 add_action('delete_post_tag', 'tag_gallery_on_tag_edit');
 add_action('saved_post_tag', 'tag_gallery_on_tag_edit');
 
-add_action('tag_gallery_refresh_cron', 'tag_gallery_refresh_cron');
+add_action('tag_gallery_refresh_cron', 'tag_gallery_init');
