@@ -71,6 +71,21 @@ class TagGalleryImageInfo
         return $imgInfo;
     }
 
+    static function is_excluded(DOMElement $el, string $slug)
+    {
+        $parent = $el->parentNode;
+        while ($parent != null) {
+            if ($parent instanceof DOMElement) {
+                $classes = $parent->getAttribute("class");
+                if ($classes != null && (str_contains($classes, "exclude:" . $slug) || str_contains($classes, "exclude:*"))) {
+                    return true;
+                }
+            }
+            $parent = $parent->parentNode;
+        }
+        return false;
+    }
+
     static function from_post(WP_Post $post): array
     {
         if (get_post_status($post) != 'publish') {
@@ -89,6 +104,9 @@ class TagGalleryImageInfo
             @$dom->loadHTML($html);
             foreach ($dom->getElementsByTagName('img') as $img) {
                 foreach ($tags as $tag) {
+                    if (TagGalleryImageInfo::is_excluded($img, $tag->slug)) {
+                        continue;
+                    }
                     array_push($infos, TagGalleryImageInfo::from_img_tag($img, $post, $tag->slug));
                 }
             }
